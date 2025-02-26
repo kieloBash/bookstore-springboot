@@ -40,7 +40,7 @@ public class CartsController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/clear-cart")
+    @PutMapping("/clear-cart")
     public ResponseEntity<Void> clearCart(@RequestParam(name = "userId") Integer user_id){
 
         this.cartsService.clearCart(user_id);

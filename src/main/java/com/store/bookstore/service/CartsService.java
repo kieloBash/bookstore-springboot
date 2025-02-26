@@ -53,6 +53,7 @@ public class CartsService {
         return new CartDTO(cart.getId(), itemCartDTOS, cart.getTotal_amount(), user_id);
     }
 
+    @Transactional
     public void addBookToCart(Integer user_id, Integer book_id){
         OurUsers user = this.usersRepository.findById(user_id).orElseThrow(()->  new RuntimeException("User not found"));
 
@@ -128,7 +129,6 @@ public class CartsService {
 
     public CartDTO clearCart(Integer user_id){
         Cart toDeleteCart = this.cartsRepository.findByUserId(user_id).orElseThrow(()-> new RuntimeException("Cart not found!"));
-        this.cartsRepository.delete(toDeleteCart);
 
         List<ItemCartDTO> itemCartDTOS = toDeleteCart.getItems().stream().map(itemcart->new ItemCartDTO(
                 itemcart.getId(),
@@ -138,6 +138,9 @@ public class CartsService {
                 itemcart.getQuantity(),
                 itemcart.getTotal_amount()
         )).toList();
+
+        toDeleteCart.setItems(new ArrayList<>());
+        this.cartsRepository.save(toDeleteCart);
 
         return new CartDTO(toDeleteCart.getId(), itemCartDTOS, toDeleteCart.getTotal_amount(), user_id);
     }
