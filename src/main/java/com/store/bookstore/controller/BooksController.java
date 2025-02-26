@@ -22,7 +22,13 @@ public class BooksController {
 
     @GetMapping
     public ResponseEntity<List<BookDTO>> getAllBooks(
-            @RequestParam(name = "search", required = false, defaultValue = "") String search){
-        return ResponseEntity.ok(booksService.getAllBooks(search));
+            @RequestParam(name = "search", required = false, defaultValue = "") String search,
+            @RequestParam(name = "category", required = false, defaultValue = "") String category){
+        return ResponseEntity.ok(booksService.getAllBooks(search,category));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getAllBookCategories(){
+        return ResponseEntity.ok(booksService.getAllBookCategories());
     }
 }
