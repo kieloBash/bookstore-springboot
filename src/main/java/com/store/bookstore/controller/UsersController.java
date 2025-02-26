@@ -2,6 +2,7 @@ package com.store.bookstore.controller;
 
 import com.store.bookstore.dto.ReqRes;
 import com.store.bookstore.service.UsersService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,12 +18,12 @@ public class UsersController {
     private UsersService usersService;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<ReqRes> register(@RequestBody ReqRes req){
+    public ResponseEntity<ReqRes> register(@Valid @RequestBody ReqRes req){
         return ResponseEntity.ok(usersService.register(req));
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ReqRes> login(@RequestBody ReqRes req){
+    public ResponseEntity<ReqRes> login(@Valid @RequestBody ReqRes req){
         return ResponseEntity.ok(usersService.login(req));
     }
 

@@ -3,6 +3,7 @@ package com.store.bookstore.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.store.bookstore.model.OurUsers;
+import jakarta.validation.Valid;
 import lombok.Data;
 
 import java.util.List;
@@ -22,7 +23,9 @@ public class ReqRes {
     private String role;
     private String email;
     private String password;
+    @Valid
     private OurUsers ourUsers;
+    @Valid
     private List<OurUsers> ourUsersList;
 
     public int getStatusCode() {

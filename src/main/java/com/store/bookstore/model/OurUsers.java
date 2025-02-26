@@ -1,6 +1,9 @@
 package com.store.bookstore.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +17,19 @@ public class OurUsers implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Email(message = "Should be a valid email")
     private String email;
+
+    @NotBlank(message = "Name is required and cannot be blank")
     private String name;
+
+    @NotBlank(message = "Password is required and cannot be blank")
     private String password;
+
+    @NotBlank(message = "Role is required and cannot be blank")
     private String role;
+
 
     public OurUsers(){}
 

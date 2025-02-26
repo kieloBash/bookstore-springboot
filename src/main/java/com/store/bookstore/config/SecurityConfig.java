@@ -33,10 +33,10 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(requests ->
-                    requests.requestMatchers("/auth/**","/public/**").permitAll()
+                    requests.requestMatchers("/auth/**","/public/**","/api/v1/**").permitAll()
                             .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
                             .requestMatchers("/user/**").hasAnyAuthority("USER")
-                            .requestMatchers("/adminuser/**").hasAnyAuthority("ADMIN","USER")
+                            .requestMatchers("/adminuser/**","/api/v1/**").hasAnyAuthority("ADMIN","USER")
                             .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(

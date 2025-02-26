@@ -33,7 +33,12 @@ public class UsersService {
             ourUser.setEmail(registrationRequest.getEmail());
             ourUser.setRole(registrationRequest.getRole());
             ourUser.setName(registrationRequest.getName());
-            ourUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            String originalPassword = registrationRequest.getPassword();
+            if(originalPassword != null && !originalPassword.trim().isEmpty()){
+                ourUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            }else{
+                ourUser.setPassword("");
+            }
             OurUsers ourUserResult = usersRepository.save(ourUser);
 
             if(ourUserResult.getId()>0){
@@ -52,25 +57,25 @@ public class UsersService {
 
     public ReqRes login(ReqRes loginRequest){
         ReqRes response = new ReqRes();
-        try{
+        try {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                             loginRequest.getPassword()));
-
             var user = usersRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
             var jwt = jwtUtils.generateToken(user);
-            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(),user);
+            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
             response.setToken(jwt);
+            response.setRole(user.getRole());
+            response.setEmail(user.getEmail());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
-            response.setMessage("Successfully Logged In!");
+            response.setMessage("Successfully Logged In");
 
-        } catch (Exception e) {
+        }catch (Exception e){
             response.setStatusCode(500);
             response.setMessage(e.getMessage());
         }
-
         return response;
     }
 
@@ -78,11 +83,13 @@ public class UsersService {
         ReqRes response = new ReqRes();
         try{
             String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
-            OurUsers users = usersRepository.findByEmail(ourEmail).orElseThrow();
-            if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users)) {
-                var jwt = jwtUtils.generateToken(users);
+            OurUsers user = usersRepository.findByEmail(ourEmail).orElseThrow();
+            if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), user)) {
+                var jwt = jwtUtils.generateToken(user);
                 response.setStatusCode(200);
                 response.setToken(jwt);
+                response.setRole(user.getRole());
+                response.setEmail(user.getEmail());
                 response.setRefreshToken(refreshTokenReqiest.getToken());
                 response.setExpirationTime("24Hr");
                 response.setMessage("Successfully Refreshed Token");
