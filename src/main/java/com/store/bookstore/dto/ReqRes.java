@@ -23,10 +23,20 @@ public class ReqRes {
     private String role;
     private String email;
     private String password;
+    private Integer userId;
     @Valid
     private OurUsers ourUsers;
     @Valid
     private List<OurUsers> ourUsersList;
+
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public int getStatusCode() {
         return statusCode;

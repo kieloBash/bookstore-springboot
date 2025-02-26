@@ -3,10 +3,7 @@ package com.store.bookstore.controller;
 import com.store.bookstore.dto.BookDTO;
 import com.store.bookstore.service.BooksService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +22,18 @@ public class BooksController {
             @RequestParam(name = "search", required = false, defaultValue = "") String search,
             @RequestParam(name = "category", required = false, defaultValue = "") String category){
         return ResponseEntity.ok(booksService.getAllBooks(search,category));
+    }
+
+    @GetMapping("/{book_id}")
+    public ResponseEntity<BookDTO> getBookById(
+            @PathVariable Integer book_id){
+        BookDTO existingBook = this.booksService.getBookById(book_id);
+
+        if(existingBook == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(existingBook);
     }
 
     @GetMapping("/categories")

@@ -68,6 +68,7 @@ public class UsersService {
             response.setToken(jwt);
             response.setRole(user.getRole());
             response.setEmail(user.getEmail());
+            response.setUserId(user.getId());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
@@ -90,6 +91,7 @@ public class UsersService {
                 response.setToken(jwt);
                 response.setRole(user.getRole());
                 response.setEmail(user.getEmail());
+                response.setUserId(user.getId());
                 response.setRefreshToken(refreshTokenReqiest.getToken());
                 response.setExpirationTime("24Hr");
                 response.setMessage("Successfully Refreshed Token");
