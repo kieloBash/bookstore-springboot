@@ -13,6 +13,7 @@ import com.store.bookstore.repository.ItemCartsRepository;
 import com.store.bookstore.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +77,68 @@ public class CartsService {
                 .sum());
 
         this.cartsRepository.save(cart);
+    }
+
+    @Transactional
+    public boolean removeBookToCart(Integer user_id, Integer book_id) {
+        // Retrieve the user's cart
+        Cart cart = this.cartsRepository.findByUserId(user_id)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        // Find the item in the cart
+        int itemIndex = -1;
+        for (int i = 0; i < cart.getItems().size(); i++) {
+            if (cart.getItems().get(i).getItem().getId() == book_id) {
+                itemIndex = i;
+                break;
+            }
+        }
+
+        // If the item was not found in the cart
+        if (itemIndex < 0) {
+            throw new RuntimeException("Item Cart not found!");
+        }
+
+
+        // If the quantity is 1 or less, remove the item
+        if (cart.getItems().get(itemIndex).getQuantity() - 1 > 0) {
+            // Decrease the quantity of the item
+            cart.getItems().get(itemIndex).setQuantity(cart.getItems().get(itemIndex).getQuantity() - 1);
+            cart.getItems().get(itemIndex).setTotal_amount(cart.getItems().get(itemIndex).getQuantity() * cart.getItems().get(itemIndex).getItem().getPrice());
+
+        } else {
+            // Delete the item from the repository before removing from the list
+            this.itemCartsRepository.delete(cart.getItems().get(itemIndex));
+
+            // Remove the item from the cart's item list
+            cart.getItems().remove(itemIndex);
+        }
+
+        cart.setTotal_amount(cart.getItems().stream()
+                .mapToDouble(ItemCart::getTotal_amount)
+                .sum());
+
+        this.cartsRepository.save(cart);
+
+
+
+        return true;
+    }
+
+
+    public CartDTO clearCart(Integer user_id){
+        Cart toDeleteCart = this.cartsRepository.findByUserId(user_id).orElseThrow(()-> new RuntimeException("Cart not found!"));
+        this.cartsRepository.delete(toDeleteCart);
+
+        List<ItemCartDTO> itemCartDTOS = toDeleteCart.getItems().stream().map(itemcart->new ItemCartDTO(
+                itemcart.getId(),
+                itemcart.getCart().getId(),
+                new BookDTO(itemcart.getItem().getId(),itemcart.getItem().getName(),itemcart.getItem().getDescription(),
+                        itemcart.getItem().getAuthor(), itemcart.getItem().getCategory(), itemcart.getItem().getPrice()),
+                itemcart.getQuantity(),
+                itemcart.getTotal_amount()
+        )).toList();
+
+        return new CartDTO(toDeleteCart.getId(), itemCartDTOS, toDeleteCart.getTotal_amount(), user_id);
     }
 }
