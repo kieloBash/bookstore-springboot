@@ -56,7 +56,7 @@ public class OrdersService {
         OurUsers currrentUser = this.usersRepository.findById(user_id)
                 .orElseThrow(()->new RuntimeException("User not found!"));
 
-        List<Order> orders = this.ordersRepository.findAllByUser_Id(user_id);
+        List<Order> orders = this.ordersRepository.findAllByUser_IdOrderByOrderDateDesc(user_id);
 
         return orders.stream().map(order->{
             return new OrderDTO(order.getId(),
