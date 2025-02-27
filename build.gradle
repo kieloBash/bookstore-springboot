@@ -36,6 +36,13 @@ dependencies {
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// Mockito dependencies
+	testImplementation 'org.mockito:mockito-core:4.8.0' // Mocking library
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0' // Mockito with JUnit Jupiter
+
+	// If you're using @ExtendWith(MockitoExtension.class)
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
 }
 
 tasks.named('test') {

@@ -34,6 +34,15 @@ public class Book {
         this.price = price;
     }
 
+    public Book(Integer id, String name, String description, String author, String category, Double price) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.category = category;
+        this.price = price;
+    }
+
     public Integer getId() {
         return id;
     }
