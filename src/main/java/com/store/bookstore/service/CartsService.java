@@ -127,21 +127,41 @@ public class CartsService {
     }
 
 
+    @Transactional
     public CartDTO clearCart(Integer user_id){
-        Cart toDeleteCart = this.cartsRepository.findByUserId(user_id).orElseThrow(()-> new RuntimeException("Cart not found!"));
+        // Retrieve the user's cart
+        Cart toDeleteCart = this.cartsRepository.findByUserId(user_id)
+                .orElseThrow(() -> new RuntimeException("Cart not found!"));
 
-        List<ItemCartDTO> itemCartDTOS = toDeleteCart.getItems().stream().map(itemcart->new ItemCartDTO(
-                itemcart.getId(),
-                itemcart.getCart().getId(),
-                new BookDTO(itemcart.getItem().getId(),itemcart.getItem().getName(),itemcart.getItem().getDescription(),
-                        itemcart.getItem().getAuthor(), itemcart.getItem().getCategory(), itemcart.getItem().getPrice()),
-                itemcart.getQuantity(),
-                itemcart.getTotal_amount()
-        )).toList();
+        // Create ItemCartDTOs for the items in the cart before clearing
+        List<ItemCartDTO> itemCartDTOS = toDeleteCart.getItems().stream()
+                .map(itemcart -> new ItemCartDTO(
+                        itemcart.getId(),
+                        itemcart.getCart().getId(),
+                        new BookDTO(itemcart.getItem().getId(),
+                                itemcart.getItem().getName(),
+                                itemcart.getItem().getDescription(),
+                                itemcart.getItem().getAuthor(),
+                                itemcart.getItem().getCategory(),
+                                itemcart.getItem().getPrice()),
+                        itemcart.getQuantity(),
+                        itemcart.getTotal_amount()
+                ))
+                .toList();
 
+        // Delete all item carts associated with this cart from the repository
+        this.itemCartsRepository.deleteAll(toDeleteCart.getItems());
+
+        // Clear the list of items from the cart (redundant after deleting them, but it's a good practice)
         toDeleteCart.setItems(new ArrayList<>());
+
+        // Set the total amount to 0 after clearing the cart
+        toDeleteCart.setTotal_amount(0.0);
+
+        // Save the updated cart (with no items and total amount 0)
         this.cartsRepository.save(toDeleteCart);
 
+        // Return the updated CartDTO
         return new CartDTO(toDeleteCart.getId(), itemCartDTOS, toDeleteCart.getTotal_amount(), user_id);
     }
 }

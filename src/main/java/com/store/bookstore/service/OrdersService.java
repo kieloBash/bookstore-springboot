@@ -1,6 +1,9 @@
 package com.store.bookstore.service;
 
+import com.store.bookstore.dto.BookDTO;
 import com.store.bookstore.dto.CartDTO;
+import com.store.bookstore.dto.ItemOrderDTO;
+import com.store.bookstore.dto.OrderDTO;
 import com.store.bookstore.model.Book;
 import com.store.bookstore.model.ItemOrder;
 import com.store.bookstore.model.Order;
@@ -49,12 +52,31 @@ public class OrdersService {
         return newOrder;
     }
 
-    public List<Order> getAllUserOrder(Integer user_id){
+    public List<OrderDTO> getAllUserOrder(Integer user_id){
         OurUsers currrentUser = this.usersRepository.findById(user_id)
                 .orElseThrow(()->new RuntimeException("User not found!"));
 
         List<Order> orders = this.ordersRepository.findAllByUser_Id(user_id);
 
-        return orders;
+        return orders.stream().map(order->{
+            return new OrderDTO(order.getId(),
+                    order.getOrderDate(),
+                    order.getUser().getId(),
+                    order.getTotal_amount(),
+
+                    order.getItems().stream().map(itemOrder ->
+                            new ItemOrderDTO(itemOrder.getId()
+                            ,order.getId(),
+                                    new BookDTO(itemOrder.getItem().getId(),
+                                            itemOrder.getItem().getName(),
+                                            itemOrder.getItem().getDescription(),
+                                            itemOrder.getItem().getAuthor(),
+                                            itemOrder.getItem().getCategory(),
+                                            itemOrder.getTotal_amount()),
+                                    itemOrder.getQuantity(),
+                                    itemOrder.getTotal_amount())
+                            ).toList()
+                    );
+        }).toList();
     }
 }
